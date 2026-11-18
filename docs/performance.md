@@ -57,7 +57,7 @@ Allocation is not peak RSS. Short-source latency did not improve in every case.
 Search still scans candidates; it is not a persistent full-text inverted index.
 
 ```sh
-CGO_ENABLED=0 go test ./internal/storage ./internal/techmark -run '^$' \
+CGO_ENABLED=0 ./tests/go.sh test ./internal/storage ./internal/techmark -run '^$' \
   -bench '^Benchmark(RevisionSummaryRead|WarmDocumentSearch|WarmArticleRender)$' \
   -benchmem -benchtime=200ms -count=3
 ```
@@ -86,7 +86,7 @@ frames. A synthetic 10,001-document fixture was checked at desktop and 390px wid
 Those historical checks are not current real-phone verification.
 
 ```sh
-go test ./internal/server -run '^$' -bench '^BenchmarkGraphSnapshot$' -benchmem -benchtime=3x
+./tests/go.sh test ./internal/server -run '^$' -bench '^BenchmarkGraphSnapshot$' -benchmem -benchtime=3x
 node --experimental-strip-types web/scripts/benchmark-graph.mjs
 ```
 

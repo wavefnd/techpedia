@@ -21,12 +21,13 @@ if [[ "$suite" != integration ]]; then
   npm run typecheck --prefix web
   npm run test --prefix web
   npm run build --prefix web
-  go test ./...
-  go vet ./...
+  ./tests/go.sh test ./...
+  ./tests/go.sh vet ./...
+  ./tests/go.sh --module benchmark test ./...
   release_test_build_lock
 fi
 if [[ "$suite" != unit ]]; then
-  bash -n start.sh restart.sh stop.sh backup.sh restore.sh move.sh tests/run.sh tests/server.sh tests/lib/build-lock.sh
+  bash -n start.sh restart.sh stop.sh backup.sh restore.sh move.sh tests/run.sh tests/go.sh tests/server.sh tests/lib/build-lock.sh
   node --test tests/integration/*.test.mjs
 fi
 if [[ "$suite" == all ]]; then

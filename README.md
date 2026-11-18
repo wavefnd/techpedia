@@ -77,6 +77,8 @@ Use `./tests/run.sh` for the complete check suite, or
 `./tests/server.sh` for an isolated native test wiki on loopback. Its database,
 logs, binaries and temporary files live under ignored `.local/test/`, never `data/`.
 See [tests/README.md](tests/README.md) for setup and test-only credentials.
+Go test source files are stored in `tests/go/`; use `./tests/go.sh test ./...`
+to run them in their original package context through Go's overlay support.
 
 Documentation is an isolated VitePress package, not a dependency of the reader:
 

@@ -8,6 +8,10 @@ Python provides profiles and a standalone HTML/SVG report without external packa
 
 ## Run
 
+The load generator's Go test sources are stored separately in
+`tests/go/benchmark/`. Run `./tests/go.sh --module benchmark test ./...` from the
+repository root to check them without starting any load test or containers.
+
 Requires Docker Engine/Compose and Python 3:
 
 ```sh

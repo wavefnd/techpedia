@@ -5,7 +5,7 @@ about: Evidence-backed bugs, improvements, and verification work
 
 ## Summary
 
-Describe the problem or task in Korean and explain who is affected.
+Describe the problem or task in English and explain who is affected.
 
 ## Evidence and confidence
 

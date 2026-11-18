@@ -4,11 +4,12 @@ TechPedia is a Go/BadgerDB wiki with a Vue 3/TypeScript frontend. Wiki content,
 accounts, images, and installation settings are separate from the engine source.
 
 Discuss ordinary bugs and focused improvements in the repository's issue tracker.
-Include reproduction steps, expected and actual behavior, and relevant versions.
+Write public issues and pull requests in English. Include reproduction steps,
+expected and actual behavior, and relevant versions.
 Never attach credentials, private source documents, databases, or a real `.env`.
 Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
-Keep changes small, link the issue, and update tests and the relevant English
+Keep changes small, link an existing relevant issue when available, and update tests and the relevant English
 guide. Do not change the engine version without a maintainer's release decision.
 Preserve the Korean administrator interface and configurable multilingual public
 interface. Read [AGENTS.md](AGENTS.md) for architecture and permission boundaries.
@@ -22,8 +23,9 @@ npm ci --prefix web
 npm run typecheck --prefix web
 npm run test --prefix web
 npm run build --prefix web
-go test ./...
-go vet ./...
+./tests/go.sh test ./...
+./tests/go.sh vet ./...
+./tests/go.sh --module benchmark test ./...
 npm ci --prefix docs
 npm run build --prefix docs
 ./tests/run.sh integration
@@ -36,8 +38,9 @@ security boundary. Consider mobile, RTL, arbitrary Unicode, and the initial
 article bundle when proposing a change.
 
 Cross-system tests and local execution helpers live in `tests/`; their runtime
-data stays in ignored `.local/test/`. Keep Go tests beside their packages and
-Vue unit tests in `web/tests`. See [tests/README.md](tests/README.md).
+data stays in ignored `.local/test/`. Go test source files live under `tests/go/`
+and run in their original package context through a temporary Go overlay. Vue
+unit tests stay in `web/tests`. See [tests/README.md](tests/README.md).
 
 ## Rights
 

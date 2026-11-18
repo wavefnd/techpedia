@@ -41,7 +41,8 @@ release archive. It excludes runtime data, environment files and local test outp
 ## Local testing
 
 The `tests/` directory holds integration tests and local execution helpers.
-Go unit tests remain with their packages; Vue unit tests remain in `web/tests`.
+Go test sources are stored separately under `tests/go/` and executed in their
+original package context by `./tests/go.sh`. Vue unit tests remain in `web/tests`.
 Test DBs, logs, binaries and temporary files belong to ignored `.local/test/`.
 Never load production `.env` or reuse `data/` in the local test server.
 

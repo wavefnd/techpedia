@@ -74,7 +74,10 @@ Source updates use the approved GitHub origin and a clean `main` checkout with
 fast-forward-only merges. Local test execution is separate: `tests/` owns
 integration/runtime helpers, while ignored `.local/test/` holds test state.
 The native test helper binds only to loopback and does not load production `.env`
-or reuse `data/`. Package-level Go and Vue unit tests stay beside their code.
+or reuse `data/`. Go test sources live in `tests/go/`, mirroring production paths;
+the test runner supplies a temporary Go overlay so package-private regression
+checks do not require exported production APIs or duplicated implementation code.
+Vue unit tests remain in `web/tests`.
 
 See [deployment](deployment.md), [configuration](configuration.md),
 [source management](source-control.md), [API boundaries](api.md), and

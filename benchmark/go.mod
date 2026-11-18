@@ -1,6 +1,6 @@
 module techpedia/benchmark
 
-go 1.25.8
+go 1.26.8
 
 require techpedia v0.0.0
 
@@ -11,6 +11,8 @@ require (
 	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/ebitengine/purego v0.10.1 // indirect
+	github.com/gen2brain/webp v0.6.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
@@ -19,8 +21,9 @@ require (
 	go.opentelemetry.io/otel v1.37.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	golang.org/x/image v0.45.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
 	google.golang.org/protobuf v1.36.7 // indirect
 )

@@ -4,15 +4,42 @@ Tests and local runtime data are separate from a deployed wiki.
 
 | Location | Purpose |
 | --- | --- |
-| `internal/**/*_test.go` | Go package unit, storage, handler and parser tests |
+| `tests/go/internal` | Go package unit, storage, handler, parser, fuzz and benchmark test sources |
+| `tests/go/benchmark` | Tests for the standalone benchmark module |
+| `tests/go/tests` | Go test-runner regression tests |
 | `web/tests` | Vue/component/service unit tests |
 | `tests/integration` | Cross-system deployment and local-runtime checks |
 | `tests/performance` | Browser/low-end audit tools |
 | `benchmark` | Standalone disposable load-benchmark module |
 | `.local/test` | Ignored local DB, logs, binary and temporary files |
 
-Keep Go tests with their packages so private-package behavior remains testable.
-Do not move unit tests into an artificial external package only to centralize paths.
+All Go `_test.go` source files live under `tests/go/`, mirroring their original
+repository paths. The nested module boundary only excludes stored sources from
+ordinary package discovery; it is not a standalone runnable test module.
+
+`tests/go.sh` runs the standard Go command with a temporary `-overlay` JSON map.
+Go compiles the separate files in their original package context, including
+unexported access, external test packages, fuzz seeds and benchmarks. No test files
+are copied or linked into product directories, production APIs are not enlarged,
+and production builds do not load the overlay. Relative fixture paths and
+`go:embed` retain their original package meaning.
+
+Use the wrapper instead of plain `go test ./...`: the latter does not load the
+separate sources and must not be reported as full test verification. Tests are
+selected by original package paths, not by their storage paths:
+
+```sh
+./tests/go.sh test ./...
+./tests/go.sh test ./internal/storage -run TestReadIndexes
+./tests/go.sh vet ./...
+./tests/go.sh --module benchmark test ./...
+```
+
+Other Go test flags such as `-race`, `-count`, `-bench`, `-fuzz`, `-json` and
+`-coverprofile` are forwarded. Temporary overlay metadata and test temporary files
+are kept in `.local/test/tmp`; the runner removes its own overlay metadata on
+normal completion or failure. It rejects missing, empty or symlinked test trees,
+or a test present in both the production and separate source directories.
 
 ## Run checks
 
@@ -26,7 +53,8 @@ npm ci --prefix docs
 ```
 
 `./tests/run.sh unit` runs frontend typecheck/tests/build followed by Go tests and
-vet. `./tests/run.sh integration` checks scripts and cross-system fixtures without
+vet through the overlay runner, plus the benchmark module's Go tests.
+`./tests/run.sh integration` checks scripts and cross-system fixtures without
 starting the real wiki, Docker, or any network client. `all` runs both suites,
 benchmark-tool tests and the documentation build. Temporary fixtures use
 `.local/test/tmp` when invoked through this entry point.
@@ -42,7 +70,7 @@ The complete suite does not implicitly run race or load tests. Run these explici
 on suitable hardware:
 
 ```sh
-go test -race ./internal/auth ./internal/storage ./internal/server ./internal/techmark
+./tests/go.sh test -race ./internal/auth ./internal/storage ./internal/server ./internal/techmark
 node tests/performance/low-end-audit.mjs http://127.0.0.1:18090/en/wiki/Example
 ```
 

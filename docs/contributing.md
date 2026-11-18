@@ -10,8 +10,11 @@ Documentation and operational script messages use English. The administrator UI
 remains Korean, and public interface packs/content remain multilingual. This
 documentation site is isolated from the Go-embedded reader frontend.
 
-Before submitting, build web assets, run Go tests/vet, frontend typecheck/tests,
-and the documentation build. Do not commit generated assets, dependencies,
+Before submitting, build web assets, run Go tests/vet through `./tests/go.sh`,
+frontend typecheck/tests, and the documentation build. Go test source files live
+separately under `tests/go/`; see the repository's
+[test guide](https://github.com/wavefnd/techpedia/blob/main/tests/README.md).
+Do not commit generated assets, dependencies,
 credentials or runtime data. Version changes are maintainer release decisions.
 
 For implementation boundaries, start with [architecture](arch.md) and

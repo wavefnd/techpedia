@@ -5,6 +5,16 @@ Maintainers decide releases; implementation alone does not increment a version.
 Historical two-part version labels and tags such as `v1.10-3` retain their original meaning.
 This English history summarizes the original development record.
 
+## v1.10.14
+
+- Move all Go test sources into `tests/go/` without changing existing test bodies.
+- Run separate test sources in their original package context through a temporary
+  Go overlay, preserving private-access, fuzz, benchmark and coverage checks.
+- Update local commands, CI and documentation, and align the benchmark module
+  with the engine's Go version and dependencies.
+- Require English public issue/PR text and keep routine agent progress reports
+  in the conversation instead of automatically creating or updating issues.
+
 ## v1.10.13
 
 - Complete the GitHub-only development workflow and remove obsolete provider CI,
