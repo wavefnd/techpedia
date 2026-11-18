@@ -137,7 +137,7 @@ Rules:
 
 Write operations use account sessions and explicit permissions.
 
-The optional `/mcp` endpoint is disabled by default and requires an administrator-approved OAuth bearer token. Registration, consent and revocation belong only in `/admin/connections`; every request and refresh must verify current admin/owner permissions and the same immutable account identity. `wiki:read` reads public source/history; separate `wiki:propose` consent allows only immutable create/edit/language-link proposals. A current admin/owner cookie session must review the exact diff/link and explicitly decide in `/admin/proposals`; application, snapshot checks and source-free audit commit transactionally. Existing read grants are never upgraded automatically. No delete, unlink, merge, approve or commit MCP tool is permitted. Document deletion is owner-only. Keep integrations behind `internal/wiki` and explicit storage contracts. Tool annotations, ChatGPT confirmations and model `confirmed` arguments are not external write authorization. The focused integration tracker is [GitLab #50](https://gitlab.com/wave-inc/wave-web/techpedia/-/work_items/50); the large bot platform is deferred, not removed.
+The optional `/mcp` endpoint is disabled by default and requires an administrator-approved OAuth bearer token. Registration, consent and revocation belong only in `/admin/connections`; every request and refresh must verify current admin/owner permissions and the same immutable account identity. `wiki:read` reads public source/history; separate `wiki:propose` consent allows only immutable create/edit/language-link proposals. A current admin/owner cookie session must review the exact diff/link and explicitly decide in `/admin/proposals`; application, snapshot checks and source-free audit commit transactionally. Existing read grants are never upgraded automatically. No delete, unlink, merge, approve or commit MCP tool is permitted. Document deletion is owner-only. Keep integrations behind `internal/wiki` and explicit storage contracts. Tool annotations, ChatGPT confirmations and model `confirmed` arguments are not external write authorization. Track integration work in this repository's GitHub issues; the large bot platform is deferred, not removed.
 
 Rules:
 
@@ -247,13 +247,15 @@ Rules:
 - Techdata tests must cover forward/reverse wiki index consistency, duplicate locale conflicts, typed values, and transaction rollback.
 - Vue changes should pass type checking and focused component tests where behavior is non-trivial.
 - Do not require Docker for normal unit tests.
+- Keep Go unit tests beside their packages and Vue unit tests in `web/tests`. Put cross-system tests in `tests/integration`, performance/browser audit tools in `tests/performance`, and local test data, binaries, logs and temporary files under ignored `.local/test`.
+- Use `./tests/run.sh` for the aggregate suite and `./tests/server.sh` for a loopback-only native test installation. Never load production `.env` or reuse production `data/` in test helpers.
 - If tests cannot run in the current environment, state that clearly in the final response.
 
 ## Documentation Rules
 
 Docs are part of the product design.
 
-Task tracking belongs in this repository's GitLab issues, not new roadmap or TODO lists in `docs`.
+Task tracking belongs in this repository's GitHub issues, not new roadmap or TODO lists in `docs`.
 
 - Create and maintain issues in Korean for bugs, improvements, verification work, and future features.
 - Check existing issues before creating duplicates. Include evidence, confirmation level, scope, and completion criteria; do not report an unverified suspicion as a reproduced bug.
@@ -261,7 +263,7 @@ Task tracking belongs in this repository's GitLab issues, not new roadmap or TOD
 - Link relevant issues from design documents when useful. An issue or future-version label does not authorize implementation or an engine-version change.
 - Never publish credentials, private runtime data, or document/user personal information in an issue.
 
-The backlog entry point is https://gitlab.com/wave-inc/wave-web/techpedia/-/work_items/48.
+The backlog entry point is https://github.com/wavefnd/techpedia/issues.
 
 Update documentation when changing:
 

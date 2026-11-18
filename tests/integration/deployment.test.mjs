@@ -20,9 +20,9 @@ function git(cwd, ...args) {
   assert.equal(r.status, 0, r.stderr)
   return r.stdout.trim()
 }
-function init(dir, branch) {
+function init(dir) {
   mkdirSync(dir, { recursive: true })
-  git(dir, 'init', '--initial-branch=' + branch)
+  git(dir, 'init', '--initial-branch=main')
   git(dir, 'config', 'user.name', 'Deployment test')
   git(dir, 'config', 'user.email', 'test@example.invalid')
 }
@@ -31,35 +31,57 @@ function put(dir, name, body, executable = false) {
 }
 function commit(dir) { git(dir, 'add', '.'); git(dir, 'commit', '-m', 'fixture') }
 
-test('restart changes known GitLab source to GitHub main, preserving runtime and legacy branch', t => {
+function installation(t) {
   const base = fixture(t), upstream = join(base, 'upstream'), install = join(base, 'install')
-  init(upstream, 'main')
-  const starter = '#!/usr/bin/env bash\nprintf "%s" "$1" > started\n'
-  put(upstream, 'start.sh', starter, true)
+  init(upstream)
+  put(upstream, 'start.sh', '#!/usr/bin/env bash\nprintf "%s" "$1" > started\n', true)
+  put(upstream, 'restart.sh', readFileSync(join(source, 'restart.sh')), true)
   put(upstream, '.gitignore', '.env\ndata/\nstarted\n')
-  put(upstream, 'marker', 'public source')
+  put(upstream, 'marker', 'initial source')
   commit(upstream)
-  init(install, 'new')
-  put(install, 'start.sh', starter, true)
-  put(install, 'restart.sh', readFileSync(join(source, 'restart.sh')), true)
-  put(install, '.gitignore', '.env\ndata/\nstarted\n')
-  put(install, 'marker', 'private legacy source')
-  commit(install)
-  git(install, 'remote', 'add', 'origin', 'https://gitlab.com/wave-inc/wave-web/techpedia.git')
+  git(base, 'clone', '--branch', 'main', upstream, install)
+  git(install, 'config', 'user.name', 'Deployment test')
+  git(install, 'config', 'user.email', 'test@example.invalid')
+  git(install, 'remote', 'set-url', 'origin', 'https://github.com/wavefnd/techpedia.git')
   put(install, '.env', 'TEST=private')
   mkdirSync(join(install, 'data')); put(join(install, 'data'), 'sentinel', 'keep')
+  put(upstream, 'marker', 'updated source'); commit(upstream)
   const bin = join(base, 'bin'); mkdirSync(bin)
   put(bin, 'git', `#!/usr/bin/env bash\nif [[ "$1" == fetch ]]; then shift 2; exec '${gitBinary}' fetch '${upstream}' "$@"; fi\nexec '${gitBinary}' "$@"\n`, true)
-  const r = run(install, 'bash', ['restart.sh'], { PATH: bin + ':' + process.env.PATH })
+  return { install, upstream, env: { PATH: bin + ':' + process.env.PATH } }
+}
+
+test('restart fast-forwards approved main without touching runtime or remote', t => {
+  const { install, upstream, env } = installation(t)
+  const r = run(install, 'bash', ['restart.sh'], env)
   assert.equal(r.status, 0, r.stderr)
+  assert.equal(git(install, 'rev-parse', 'HEAD'), git(upstream, 'rev-parse', 'HEAD'))
   assert.equal(git(install, 'branch', '--show-current'), 'main')
   assert.equal(git(install, 'remote', 'get-url', 'origin'), 'https://github.com/wavefnd/techpedia.git')
-  assert.equal(readFileSync(join(install, 'marker'), 'utf8'), 'public source')
   assert.equal(readFileSync(join(install, '.env'), 'utf8'), 'TEST=private')
   assert.equal(readFileSync(join(install, 'data/sentinel'), 'utf8'), 'keep')
-  assert.equal(git(install, 'show', 'new:marker'), 'private legacy source')
   assert.equal(readFileSync(join(install, 'started'), 'utf8'), '--force-recreate')
 })
+
+for (const reason of ['dirty source', 'unapproved origin', 'feature branch', 'divergent main']) {
+  test(`restart rejects ${reason} without starting or replacing local source`, t => {
+    const { install, env } = installation(t)
+    if (reason === 'dirty source') put(install, 'marker', 'local uncommitted source')
+    if (reason === 'unapproved origin') git(install, 'remote', 'set-url', 'origin', 'https://example.invalid/unapproved.git')
+    if (reason === 'feature branch') git(install, 'switch', '-c', 'codex/local-change')
+    if (reason === 'divergent main') { put(install, 'marker', 'local committed source'); commit(install) }
+    const before = git(install, 'rev-parse', 'HEAD')
+    const marker = readFileSync(join(install, 'marker'), 'utf8')
+    const origin = git(install, 'remote', 'get-url', 'origin')
+    const r = run(install, 'bash', ['restart.sh'], env)
+    assert.notEqual(r.status, 0)
+    assert.equal(git(install, 'rev-parse', 'HEAD'), before)
+    assert.equal(readFileSync(join(install, 'marker'), 'utf8'), marker)
+    assert.equal(git(install, 'remote', 'get-url', 'origin'), origin)
+    assert.equal(readFileSync(join(install, 'data/sentinel'), 'utf8'), 'keep')
+    assert.equal(existsSync(join(install, 'started')), false)
+  })
+}
 
 test('restart no-pull does not require git or change source', t => {
   const dir = fixture(t)
@@ -68,31 +90,6 @@ test('restart no-pull does not require git or change source', t => {
   assert.equal(run(dir, 'bash', ['restart.sh', '--no-pull']).status, 0)
   assert.equal(readFileSync(join(dir, 'started'), 'utf8'), '--force-recreate')
   assert.equal(run(dir, 'bash', ['restart.sh', '--no-pull', 'extra']).status, 2)
-})
-
-test('public export has one main root commit and no private history/runtime', t => {
-  const base = fixture(t), repo = join(base, 'repo'), out = join(base, 'public')
-  init(repo, 'new'); mkdirSync(join(repo, 'scripts'))
-  put(join(repo, 'scripts'), 'export-public.sh', readFileSync(join(source, 'scripts/export-public.sh')), true)
-  put(repo, '.gitignore', '.env\ndata/\n')
-  put(repo, 'README.md', 'Old private title'); commit(repo)
-  put(repo, 'README.md', 'Reviewed public snapshot'); commit(repo)
-  put(repo, '.env', 'do-not-copy'); mkdirSync(join(repo, 'data')); put(join(repo, 'data'), 'sentinel', 'private')
-  const r = run(repo, 'bash', ['scripts/export-public.sh', out], {
-    GIT_AUTHOR_NAME: 'Export test', GIT_AUTHOR_EMAIL: 'test@example.invalid',
-    GIT_COMMITTER_NAME: 'Export test', GIT_COMMITTER_EMAIL: 'test@example.invalid',
-  })
-  assert.equal(r.status, 0, r.stderr)
-  assert.equal(git(out, 'branch', '--show-current'), 'main')
-  assert.equal(git(out, 'rev-list', '--count', 'HEAD'), '1')
-  assert.equal(git(out, 'remote'), '')
-  assert.equal(existsSync(join(out, '.env')), false)
-  assert.equal(existsSync(join(out, 'data')), false)
-  assert.equal(git(repo, 'rev-list', '--count', 'HEAD'), '2')
-  assert.equal(run(repo, 'bash', ['scripts/export-public.sh', out]).status, 2)
-  put(repo, 'untracked', 'dirty')
-  assert.equal(run(repo, 'bash', ['scripts/export-public.sh', join(base, 'blocked')]).status, 1)
-  assert.equal(existsSync(join(base, 'blocked')), false)
 })
 
 test('start rejects sample passwords and malformed env without disclosing values', t => {
@@ -108,16 +105,18 @@ test('start rejects sample passwords and malformed env without disclosing values
   assert.equal(r.stderr.includes('credential-private-value'), false)
 })
 
-test('private transfer retains Git but excludes env variants and caches', t => {
+test('private transfer retains Git but excludes env variants and local runtime', t => {
   const base = fixture(t), repo = join(base, 'repo'), archive = join(base, 'private.tar.gz')
-  init(repo, 'new')
+  init(repo)
   put(repo, 'move.sh', readFileSync(join(source, 'move.sh')), true)
   put(repo, '.env.example', 'SAMPLE=change-me')
   commit(repo)
   put(repo, '.env', 'PRIVATE=not-for-transfer')
   put(repo, '.env.production', 'PRIVATE=not-for-transfer')
-  mkdirSync(join(repo, 'docs/node_modules'), { recursive: true })
-  put(join(repo, 'docs/node_modules'), 'sentinel', 'cache')
+  for (const directory of ['docs/node_modules', '.local/test/data']) {
+    mkdirSync(join(repo, directory), { recursive: true })
+    put(join(repo, directory), 'sentinel', 'not-for-transfer')
+  }
   const r = run(repo, 'bash', ['move.sh', '--allow-dirty', archive])
   assert.equal(r.status, 0, r.stderr)
   const entries = run(base, 'tar', ['-tzf', archive]).stdout.split('\n')
@@ -126,20 +125,8 @@ test('private transfer retains Git but excludes env variants and caches', t => {
   assert.ok(!entries.includes('repo/.env'))
   assert.ok(!entries.includes('repo/.env.production'))
   assert.ok(!entries.some(x => x.startsWith('repo/docs/node_modules')))
-  // An empty optional exclusion list must also work on macOS Bash 3.
+  assert.ok(!entries.some(x => x.startsWith('repo/.local')))
   rmSync(join(repo, '.env.production'))
   const second = run(repo, 'bash', ['move.sh', '--allow-dirty', join(base, 'second.tar.gz')])
   assert.equal(second.status, 0, second.stderr)
-})
-
-test('public export refuses tracked private paths before creating destination', t => {
-  const base = fixture(t), repo = join(base, 'repo'), out = join(base, 'blocked')
-  init(repo, 'new'); mkdirSync(join(repo, 'scripts'))
-  put(join(repo, 'scripts'), 'export-public.sh', readFileSync(join(source, 'scripts/export-public.sh')), true)
-  put(repo, '.env.production', 'TEST=placeholder')
-  commit(repo)
-  const r = run(repo, 'bash', ['scripts/export-public.sh', out])
-  assert.equal(r.status, 1)
-  assert.match(r.stderr, /Forbidden public-export path/)
-  assert.equal(existsSync(out), false)
 })

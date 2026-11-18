@@ -9,7 +9,7 @@ const args = process.argv.slice(2)
 const desktop = args.includes('--desktop')
 const target = args.find((argument) => !argument.startsWith('--'))
 if (!target) {
-  console.error('Usage: node scripts/low-end-audit.mjs [--desktop] http://127.0.0.1:8080/ko/wiki/Page')
+  console.error('Usage: node tests/performance/low-end-audit.mjs [--desktop] http://127.0.0.1:18090/en/wiki/Page')
   process.exit(2)
 }
 

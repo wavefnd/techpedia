@@ -28,6 +28,13 @@ jobs:
       - run: go test -race ./internal/auth ./internal/storage ./internal/server ./internal/techmark
       - run: go mod download all
       - run: go run ./scripts/notices
-      - run: bash -n start.sh restart.sh stop.sh backup.sh restore.sh move.sh scripts/export-public.sh
-      - run: node --test scripts/tests/*.test.mjs
       - run: git diff --check
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: ./tests/run.sh integration
+      - run: python3 -m unittest discover -s benchmark/tests

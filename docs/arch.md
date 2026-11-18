@@ -70,5 +70,12 @@ Runtime paths are configurable and excluded from Git. Docker uses Node frontend,
 Go build, and final Alpine stages without Node. The documentation site is a
 separate static build; GitHub Pages cannot run Go, OAuth, or BadgerDB.
 
+Source updates use the approved GitHub origin and a clean `main` checkout with
+fast-forward-only merges. Local test execution is separate: `tests/` owns
+integration/runtime helpers, while ignored `.local/test/` holds test state.
+The native test helper binds only to loopback and does not load production `.env`
+or reuse `data/`. Package-level Go and Vue unit tests stay beside their code.
+
 See [deployment](deployment.md), [configuration](configuration.md),
-[API boundaries](api.md), and [performance](performance.md).
+[source management](source-control.md), [API boundaries](api.md), and
+[performance](performance.md).

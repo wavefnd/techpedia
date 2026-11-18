@@ -21,8 +21,8 @@ cold cache and reduced motion. This is not an exact device simulation.
 After building and serving an isolated article:
 
 ```sh
-node scripts/low-end-audit.mjs 'http://127.0.0.1:8080/en/wiki/Example'
-node scripts/low-end-audit.mjs --desktop 'http://127.0.0.1:8080/en/wiki/Example'
+node tests/performance/low-end-audit.mjs 'http://127.0.0.1:18090/en/wiki/Example'
+node tests/performance/low-end-audit.mjs --desktop 'http://127.0.0.1:18090/en/wiki/Example'
 ```
 
 Set `CHROMIUM_PATH` if needed. The CDP script reports JSON. Test only your own

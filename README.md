@@ -21,13 +21,12 @@ API boundaries and architecture:
 - [TechMark](docs/techmark.md)
 - [Architecture](docs/arch.md)
 
-After GitHub Pages is enabled, the guide is hosted at
+The guide is hosted at
 [wavefnd.github.io/techpedia](https://wavefnd.github.io/techpedia/).
 The source destination is [wavefnd/techpedia](https://github.com/wavefnd/techpedia),
-branch `main`. These addresses become available after publication; preparation
-is first delivered through the existing private GitLab repository.
+branch `main`. Development and issue tracking use this GitHub repository.
 
-## Run locally
+## Run an installation
 
 Install Git, Docker Engine and Compose v2, then:
 
@@ -64,17 +63,20 @@ Use the Go version in `go.mod` and Node 22 or newer. Build frontend assets befor
 
 ```sh
 npm ci --prefix web
-npm run typecheck --prefix web
-npm run test --prefix web
-npm run build --prefix web
-go test ./...
-go vet ./...
-TECHPEDIA_ADDR=127.0.0.1:8080 go run ./cmd/techpedia
+npm ci --prefix docs
+./tests/run.sh
+./tests/server.sh
 ```
 
 Native Go reads exported environment variables, not `.env`. Docker is optional
 for unit tests. Generated frontend assets, dependencies, databases and credentials
 are excluded from Git.
+
+Use `./tests/run.sh` for the complete check suite, or
+`./tests/run.sh integration` for cross-system tests without a server. Run
+`./tests/server.sh` for an isolated native test wiki on loopback. Its database,
+logs, binaries and temporary files live under ignored `.local/test/`, never `data/`.
+See [tests/README.md](tests/README.md) for setup and test-only credentials.
 
 Documentation is an isolated VitePress package, not a dependency of the reader:
 
@@ -87,13 +89,11 @@ npm run build --prefix docs
 ## Updates and distribution
 
 `start.sh` builds current source; `restart.sh` updates from GitHub `main` and
-rebuilds; `--no-pull` rebuilds without a source fetch. Use that flag while GitHub
-publication is pending. Scripts preserve existing `.env` and `data/`.
-See [the transition guide](docs/source-migration.md). GitLab legacy branches are
-not rewritten or deleted, and archiving is performed by the owner.
+rebuilds; `--no-pull` rebuilds without a source fetch. Scripts preserve existing
+`.env` and `data/`. Source updates require an approved GitHub origin and a clean
+`main` checkout. See [source management](docs/source-control.md).
 
-Public export uses a separate reviewed tracked snapshot with one initial main
-commit. `move.sh` includes private Git history and is **not** a public exporter.
+`move.sh` includes local Git history and is **not** a public source release archive.
 Never publish wiki content, images, user data, backups, or secrets as engine source.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and

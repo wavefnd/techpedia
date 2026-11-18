@@ -2,8 +2,18 @@
 
 Versions use `vMAJOR.MINOR.PATCH`. PATCH covers fixes and small compatible changes.
 Maintainers decide releases; implementation alone does not increment a version.
-Historical two-part tags and tags such as `v1.10-3` remain unchanged in GitLab.
+Historical two-part version labels and tags such as `v1.10-3` retain their original meaning.
 This English history summarizes the original development record.
+
+## v1.10.13
+
+- Complete the GitHub-only development workflow and remove obsolete provider CI,
+  templates and migration tooling.
+- Require a clean approved `main` checkout for fast-forward source updates.
+- Separate integration/performance tools under `tests/` and isolate native test
+  databases, logs, binaries and temporary files under ignored `.local/test/`.
+- Prevent concurrent test builds from replacing shared frontend output.
+- Make graph tests independent of host hardware and cover adaptive frame budgets.
 
 ## v1.10.12
 
@@ -11,7 +21,7 @@ This English history summarizes the original development record.
 - Replace development roadmaps with English VitePress user/operator guides and
   GitHub Pages build/deployment workflows.
 - Set server source updates to GitHub wavefnd/techpedia main, preserving runtime
-  data; keep GitLab legacy history separate.
+  data; keep archived development history separate.
 - Bound credential work, reject cross-site authentication, index closing-tag
   lookups, budget image output and bind saves/restores to authorized revisions.
 - Add focused regression tests and distribution notices.

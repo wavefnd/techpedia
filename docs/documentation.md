@@ -21,8 +21,7 @@ be committed. Production builds check internal links.
 The Pages workflow builds this site from `main` and deploys its static output.
 Pull requests only build and check; they do not publish Pages or deploy the engine.
 In the public repository, select **Settings → Pages → Source → GitHub Actions**.
-Do not enable Pages on the private preparation repository to work around a missing
-public repository address.
+Pages publishes this repository's documentation, not a private staging checkout.
 
 The configuration derives a project site's base path from `GITHUB_REPOSITORY`.
 For a project at `owner/repo`, assets use `/repo/`; an `owner.github.io` repository

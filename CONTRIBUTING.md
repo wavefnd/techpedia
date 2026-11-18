@@ -26,6 +26,7 @@ go test ./...
 go vet ./...
 npm ci --prefix docs
 npm run build --prefix docs
+./tests/run.sh integration
 git diff --check
 ```
 
@@ -33,6 +34,10 @@ Format Go with `gofmt`. Never commit generated `dist`, `node_modules`, or runtim
 data. Server permission checks are mandatory; browser route guards are not a
 security boundary. Consider mobile, RTL, arbitrary Unicode, and the initial
 article bundle when proposing a change.
+
+Cross-system tests and local execution helpers live in `tests/`; their runtime
+data stays in ignored `.local/test/`. Keep Go tests beside their packages and
+Vue unit tests in `web/tests`. See [tests/README.md](tests/README.md).
 
 ## Rights
 

@@ -14,11 +14,13 @@ const fixture = { scope: 'language', nodes: [node('a', '운영체제'), node('b'
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
 async function settle() { for (let i = 0; i < 12; i++) await Promise.resolve(); await vue.nextTick() }
 
-function setup(api = async () => fixture, mobile = false) {
+function setup(api = async () => fixture, mobile = false, hardware = {}) {
   const mounted = [], unmounted = [], renderers = [], layouts = [], theme = vue.ref('light'), routes = []
   const fontListeners = new Map()
   const documentListeners = new Map()
   const route = vue.reactive({ name: 'graph-language', params: { locale: 'ko' } })
+  const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { hardwareConcurrency: 8, ...hardware } })
   globalThis.window = { matchMedia: (query) => ({ matches: mobile && query.includes('max-width') }), setTimeout: () => 1, clearTimeout() {} }
   globalThis.document = { title: '', hidden: false, addEventListener: (key, listener) => documentListeners.set(key, listener), removeEventListener: (key) => documentListeners.delete(key), fonts: { addEventListener: (key, listener) => fontListeners.set(key, listener), removeEventListener: (key) => fontListeners.delete(key) } }
   globalThis.getComputedStyle = () => ({ fontFamily: 'Test Font', getPropertyValue: (key) => key === '--paper' ? (theme.value === 'dark' ? '#202020' : '#ffffff') : '#2366a8' })
@@ -64,7 +66,28 @@ function setup(api = async () => fixture, mobile = false) {
   const scope = vue.effectScope()
   const view = scope.run(() => output.exports.default.setup({}, { expose() {} }))
   view.container.value = { style: {} }
-  return { view, route, theme, renderers, layouts, routes, fontListeners, documentListeners, mount: async () => { mounted.forEach((f) => f()); await settle() }, stop: () => { unmounted.forEach((f) => f()); scope.stop(); delete globalThis.window; delete globalThis.document; delete globalThis.getComputedStyle; delete globalThis.Worker } }
+  return { view, route, theme, renderers, layouts, routes, fontListeners, documentListeners, mount: async () => { mounted.forEach((f) => f()); await settle() }, stop: () => { unmounted.forEach((f) => f()); scope.stop(); delete globalThis.window; delete globalThis.document; delete globalThis.getComputedStyle; delete globalThis.Worker; if (previousNavigator) Object.defineProperty(globalThis, 'navigator', previousNavigator); else delete globalThis.navigator } }
+}
+
+for (const { name, hardware, mobile, interval } of [
+  { name: 'eight cores', hardware: { hardwareConcurrency: 8 }, interval: 33 },
+  { name: 'four cores', hardware: { hardwareConcurrency: 4 }, interval: 66 },
+  { name: 'two cores', hardware: { hardwareConcurrency: 2 }, interval: 100 },
+  { name: 'low memory', hardware: { hardwareConcurrency: 8, deviceMemory: 2 }, interval: 100 },
+  { name: 'medium memory', hardware: { hardwareConcurrency: 8, deviceMemory: 4 }, interval: 66 },
+  { name: 'mobile', hardware: { hardwareConcurrency: 8 }, mobile: true, interval: 100 },
+  { name: 'missing core count', hardware: { hardwareConcurrency: undefined }, interval: 100 },
+]) {
+  test(`graph frame budget uses a deterministic ${name} profile`, async () => {
+    const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+    const screen = setup(undefined, mobile, hardware)
+    try {
+      await screen.mount()
+      assert.equal(screen.layouts[0].input.interval, interval)
+      assert.equal(screen.renderers[0].graph.order, fixture.nodes.length)
+    } finally { screen.stop() }
+    assert.deepEqual(Object.getOwnPropertyDescriptor(globalThis, 'navigator'), previousNavigator)
+  })
 }
 
 test('graph neighborhoods deduplicate directions, translations and self/missing edges', () => {

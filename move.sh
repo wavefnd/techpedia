@@ -66,6 +66,7 @@ tar "${private_excludes[@]}" \
   --exclude="${project_name}/docs/.vitepress/dist" \
   --exclude="${project_name}/backups" \
   --exclude="${project_name}/build" \
+  --exclude="${project_name}/.local" \
   --exclude="${project_name}/internal/server/static/dist" \
   --exclude="${project_name}/techpedia-transfer-*.tar.gz" \
   -czf "$output" \

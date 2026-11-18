@@ -43,7 +43,8 @@ Check login, editions, article history, Techdata links and images after recovery
 it excludes runtime data, credentials and build caches. It is not a public-source
 exporter and must not be attached to a public release. Rebuild at the destination.
 
-For a public release, use [the clean export](source-migration.md) instead.
+For a public source release, use a reviewed tracked archive as described in
+[source management](source-control.md), not a working-directory transfer.
 Moving source does not copy the existing database or change an installation's
 content license.
 

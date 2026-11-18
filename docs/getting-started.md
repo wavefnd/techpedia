@@ -6,9 +6,8 @@
 - A modern browser. Firefox is supported; no Chrome-only browser API is required.
 - Free disk space for images, Go/Node build layers, and runtime data.
 
-Clone `https://github.com/wavefnd/techpedia.git` on `main` after publication.
-During preparation, use the approved GitLab checkout and rebuild with
-`./restart.sh --no-pull`. Do not substitute a similarly named third-party repository.
+Clone `https://github.com/wavefnd/techpedia.git` on `main`.
+Do not substitute a similarly named third-party repository.
 
 ## Configure a local installation
 
@@ -71,12 +70,17 @@ From the repository root:
 
 ```sh
 npm ci --prefix web
-npm run build --prefix web
-go test ./...
-TECHPEDIA_ADDR=127.0.0.1:8080 go run ./cmd/techpedia
+npm ci --prefix docs
+./tests/run.sh
+./tests/server.sh
 ```
 
-The native Go process consumes exported environment variables; it does not load
-`.env` itself. Export bootstrap credentials before launching it. Native Go defaults
-to `0.0.0.0:8080` unless `TECHPEDIA_ADDR` is set; Compose's host-loopback binding
-does not apply to this path. Do not expose a development listener publicly.
+The dedicated helper binds to `127.0.0.1:18090` and keeps test DBs, logs and binaries
+in `.local/test/`. It does not read the root `.env` or reuse `data/`. Explicit
+test-only owner variables are described in the repository's
+[test guide](https://github.com/wavefnd/techpedia/blob/main/tests/README.md).
+
+A directly launched native Go process reads exported environment variables, not
+`.env`. It defaults to `0.0.0.0:8080`; Compose's host-loopback binding does not
+apply to that path. Prefer the test helper for development and configure native
+production deployment deliberately.

@@ -1,5 +1,7 @@
 .git
 .gitignore
+.local
+tests
 .env
 .env.*
 !.env.example

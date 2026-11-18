@@ -12,9 +12,8 @@ cp .env.example .env
 chmod 600 .env
 ```
 
-The clone works after GitHub publication. During private preparation, use the
-approved GitLab checkout and `./restart.sh --no-pull`. Do not download a similarly
-named third-party repository.
+Use the official GitHub repository and `main`. Do not download a similarly named
+third-party repository.
 
 ## HTTPS with bundled Caddy
 
@@ -59,12 +58,12 @@ uploads and canonical URLs through the actual proxy.
 ```
 
 Restart updates from GitHub `main`, requires a clean source tree, then rebuilds.
-Use `--no-pull` before GitHub publication or to rebuild an existing checkout.
-Stop preserves runtime data. GitLab archiving remains a manual owner action.
+Use `--no-pull` to rebuild an existing checkout without fetching source.
+Stop preserves runtime data.
 
 Compose mounts `./data` at `/data` for BadgerDB, auth, search and media. Keep it
 and `.env` out of public source archives. See [recovery](operations.md) and the
-[GitHub source transition](source-migration.md).
+[source management](source-control.md).
 
 For native deployment, build frontend assets before `go build ./cmd/techpedia`,
 export settings explicitly and supervise the binary with a service manager.

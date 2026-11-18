@@ -21,12 +21,8 @@ if [[ "$pull_updates" == "true" ]]; then
     echo "Uncommitted changes; commit or resolve them before updating." >&2
     exit 1
   fi
-  upstream=https://github.com/wavefnd/techpedia.git
   current_origin=$(git remote get-url origin)
   case "$current_origin" in
-    https://gitlab.com/wave-inc/wave-web/techpedia.git|git@gitlab.com:wave-inc/wave-web/techpedia.git)
-      git remote set-url origin "$upstream"
-      ;;
     https://github.com/wavefnd/techpedia.git|git@github.com:wavefnd/techpedia.git)
       ;;
     *)
@@ -34,14 +30,11 @@ if [[ "$pull_updates" == "true" ]]; then
       exit 1
       ;;
   esac
-  git fetch origin refs/heads/main:refs/remotes/origin/main
   if [[ "$(git branch --show-current)" != "main" ]]; then
-    if git show-ref --verify --quiet refs/heads/main; then
-      git switch main
-    else
-      git switch --create main --track origin/main
-    fi
+    echo "Source updates require main; switch branches explicitly or use --no-pull." >&2
+    exit 1
   fi
+  git fetch origin refs/heads/main:refs/remotes/origin/main
   git merge --ff-only origin/main
 fi
 
