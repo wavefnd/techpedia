@@ -1,0 +1,69 @@
+services:
+  seed:
+    build:
+      context: ..
+      dockerfile: benchmark/Dockerfile
+    image: techpedia/benchmark-tools:local
+    environment:
+      BENCH_DATA_DIR: /data
+      BENCH_DOCUMENTS: "${BENCH_DOCUMENTS:-1000}"
+    command:
+      - /bin/sh
+      - -c
+      - /usr/local/bin/seed && chown -R 100:101 /data
+    volumes:
+      - benchmark-data:/data
+
+  engine:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: techpedia/benchmark-engine:local
+    restart: "no"
+    cpus: "${BENCH_ENGINE_CPUS:-2.0}"
+    mem_limit: "${BENCH_ENGINE_MEMORY:-1024m}"
+    pids_limit: 512
+    environment:
+      TECHPEDIA_ADDR: 0.0.0.0:8080
+      TECHPEDIA_DATA_DIR: /data
+      TECHPEDIA_PUBLIC_URL: http://engine:8080
+    volumes:
+      - benchmark-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 2s
+
+  loadgen:
+    image: techpedia/benchmark-tools:local
+    cpus: "${BENCH_LOADGEN_CPUS:-4.0}"
+    mem_limit: "${BENCH_LOADGEN_MEMORY:-2048m}"
+    pids_limit: 8192
+    depends_on:
+      engine:
+        condition: service_healthy
+    user: "${BENCH_UID:-1000}:${BENCH_GID:-1000}"
+    environment:
+      BENCH_TARGET_URL: http://engine:8080
+      BENCH_TARGETS: "${BENCH_TARGETS:-100,250,500,1000,2000,4000,8000}"
+      BENCH_STAGE_DURATION: "${BENCH_STAGE_DURATION:-20s}"
+      BENCH_WARMUP_DURATION: "${BENCH_WARMUP_DURATION:-8s}"
+      BENCH_REQUEST_TIMEOUT: "${BENCH_REQUEST_TIMEOUT:-5s}"
+      BENCH_WORKERS: "${BENCH_WORKERS:-4096}"
+      BENCH_MAX_P95: "${BENCH_MAX_P95:-1s}"
+      BENCH_MAX_ERROR_RATE: "${BENCH_MAX_ERROR_RATE:-0.01}"
+      BENCH_MIN_ACHIEVEMENT: "${BENCH_MIN_ACHIEVEMENT:-0.95}"
+      BENCH_DOCUMENTS: "${BENCH_DOCUMENTS:-1000}"
+      BENCH_REFINE_STEPS: "${BENCH_REFINE_STEPS:-4}"
+      BENCH_PEAK_FACTOR: "${BENCH_PEAK_FACTOR:-1}"
+      BENCH_PROFILE_NAME: "${BENCH_PROFILE_NAME:-staircase}"
+      BENCH_CONTINUE_AFTER_FAILURE: "${BENCH_CONTINUE_AFTER_FAILURE:-false}"
+      BENCH_RESULT: /results/latest.json
+    command: ["/usr/local/bin/loadgen"]
+    volumes:
+      - ./results:/results
+
+volumes:
+  benchmark-data:

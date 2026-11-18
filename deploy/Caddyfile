@@ -1,0 +1,12 @@
+{
+	email {$TECHPEDIA_TLS_EMAIL}
+}
+
+{$TECHPEDIA_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy techpedia:8080
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+	}
+}

@@ -1,0 +1,35 @@
+@font-face {
+  font-family: 'Noto Sans Greek Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/noto-greek/noto-sans-greek-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+1F00-1FFF;
+}
+
+@font-face {
+  font-family: 'Noto Sans Greek Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/noto-greek/noto-sans-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Noto Sans Greek Variable';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/noto-greek/noto-sans-greek-ext-wght-italic.woff2') format('woff2-variations');
+  unicode-range: U+1F00-1FFF;
+}
+
+@font-face {
+  font-family: 'Noto Sans Greek Variable';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/noto-greek/noto-sans-greek-wght-italic.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}

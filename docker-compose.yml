@@ -1,0 +1,72 @@
+services:
+  techpedia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: techpedia/wiki-engine:dev
+    container_name: techpedia
+    restart: unless-stopped
+
+    ports:
+      - "${TECHPEDIA_HTTP_BIND:-127.0.0.1}:8080:8080"
+
+    environment:
+      TECHPEDIA_ADDR: "0.0.0.0:8080"
+      TECHPEDIA_DATA_DIR: "/data"
+      TECHPEDIA_PUBLIC_URL: "${TECHPEDIA_PUBLIC_URL:-http://localhost:8080}"
+      TECHPEDIA_CSP_MODE: "${TECHPEDIA_CSP_MODE:-report-only}"
+      TECHPEDIA_INTERFACE_AUTO_TRANSLATION: "${TECHPEDIA_INTERFACE_AUTO_TRANSLATION:-true}"
+      TECHPEDIA_INTERFACE_TRANSLATION_URL: "${TECHPEDIA_INTERFACE_TRANSLATION_URL:-https://api.mymemory.translated.net/get}"
+      TECHPEDIA_INTERFACE_TRANSLATION_EMAIL: "${TECHPEDIA_INTERFACE_TRANSLATION_EMAIL:-}"
+      TECHPEDIA_ANALYTICS_ENABLED: "${TECHPEDIA_ANALYTICS_ENABLED:-true}"
+      TECHPEDIA_ANALYTICS_COUNTRY_HEADER: "${TECHPEDIA_ANALYTICS_COUNTRY_HEADER:-CF-IPCountry}"
+      TECHPEDIA_MCP_ENABLED: "${TECHPEDIA_MCP_ENABLED:-false}"
+      TECHPEDIA_SERVER_LOCATION: "${TECHPEDIA_SERVER_LOCATION:-}"
+      TECHPEDIA_BOOTSTRAP_ADMIN_USERNAME: "${TECHPEDIA_BOOTSTRAP_ADMIN_USERNAME:-}"
+      TECHPEDIA_BOOTSTRAP_ADMIN_PASSWORD: "${TECHPEDIA_BOOTSTRAP_ADMIN_PASSWORD:-}"
+      TECHPEDIA_MEDIA_STORAGE_LIMIT_BYTES: "${TECHPEDIA_MEDIA_STORAGE_LIMIT_BYTES:-943718400}"
+      TECHPEDIA_MEDIA_UPLOAD_LIMIT_BYTES: "${TECHPEDIA_MEDIA_UPLOAD_LIMIT_BYTES:-10485760}"
+
+    depends_on:
+      techpedia-data-init:
+        condition: service_completed_successfully
+
+    volumes:
+      - ./data:/data
+      - /etc/os-release:/host/etc/os-release:ro
+      - /etc/hostname:/host/etc/hostname:ro
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  techpedia-data-init:
+    image: alpine:latest
+    restart: "no"
+    command: ["sh", "-c", "mkdir -p /data/badger /data/auth /data/search /data/media/objects /data/media/temp && chown -R 100:101 /data/badger /data/auth /data/search /data/media && chmod 755 /data/badger /data/auth /data/search /data/media /data/media/objects /data/media/temp"]
+    volumes:
+      - ./data:/data
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    container_name: techpedia-caddy
+    restart: unless-stopped
+    profiles: ["production"]
+    depends_on:
+      techpedia:
+        condition: service_healthy
+    environment:
+      TECHPEDIA_DOMAIN: "${TECHPEDIA_DOMAIN:-}"
+      TECHPEDIA_TLS_EMAIL: "${TECHPEDIA_TLS_EMAIL:-}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy/data:/data
+      - ./data/caddy/config:/config

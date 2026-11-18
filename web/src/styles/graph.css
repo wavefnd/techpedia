@@ -1,0 +1,83 @@
+.graph-view { height: calc(100dvh - 64px); min-height: 420px; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; background: var(--paper); }
+.graph-toolbar { position: relative; z-index: 3; min-height: 80px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.graph-title { min-width: 140px; margin-inline-end: auto; }
+.graph-title h1 { margin: 0; font-size: 21px; line-height: 1.25; }
+.graph-title p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+.graph-title p span { margin: 0 4px; }
+.graph-scope { display: flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.graph-scope a { min-height: 36px; display: grid; place-items: center; padding: 0 11px; color: var(--muted); font-size: 12px; font-weight: 650; }
+.graph-scope a + a { border-inline-start: 1px solid var(--line); }
+.graph-scope a:hover { background: var(--surface); text-decoration: none; }
+.graph-scope a.active { background: var(--accent); color: var(--on-accent); }
+.graph-language-picker { min-width: 0; }
+.graph-language-picker select { width: 160px; max-width: 100%; height: 38px; padding-inline: 9px 26px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font-size: 13px; }
+.graph-search { position: relative; width: 240px; height: 38px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); }
+.graph-search:focus-within { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.graph-search > svg { flex: 0 0 auto; color: var(--muted); }
+.graph-search input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 13px; }
+.graph-search-results { position: absolute; z-index: 8; top: calc(100% + 6px); inset-inline: -1px; max-height: min(360px, 50dvh); overflow: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); box-shadow: 0 8px 20px var(--shadow); }
+.graph-search-results button { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--ink); text-align: start; cursor: pointer; }
+.graph-search-results button:hover, .graph-search-results button:focus-visible { background: var(--surface); }
+.graph-search-results button span { overflow-wrap: anywhere; }
+.graph-search-results small { color: var(--muted); text-transform: uppercase; }
+.graph-search-results p { margin: 0; padding: 12px; color: var(--muted); font-size: 13px; }
+.graph-reset { width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 5px; }
+.graph-reset:hover { background: var(--surface); }
+.graph-stage { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; }
+.graph-stage.has-selection { grid-template-columns: minmax(0, 1fr) 300px; }
+.graph-viewport { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.graph-canvas { position: absolute; inset: 0; cursor: grab; }
+.graph-canvas:active { cursor: grabbing; }
+.graph-state { position: absolute; z-index: 2; inset: 0; display: grid; place-items: center; padding: 24px; background: var(--paper); color: var(--muted); text-align: center; }
+.graph-state.error { color: var(--missing); }
+.graph-exploration { position: absolute; z-index: 2; top: 12px; inset-inline-start: 12px; max-width: min(450px, calc(100% - 24px)); padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--muted); pointer-events: none; font-size: 12px; }
+.graph-exploration p { margin: 6px 0 0; line-height: 1.5; }
+.graph-layout-controls { display: flex; align-items: center; gap: 8px; }
+.graph-layout-controls button { flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); cursor: pointer; pointer-events: auto; }
+.graph-layout-controls button:disabled { opacity: .4; cursor: default; }
+.graph-zoom { position: absolute; z-index: 2; inset-inline-start: 12px; bottom: 12px; display: grid; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; background: var(--paper); }
+.graph-zoom button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.graph-zoom button + button { border-top: 1px solid var(--line); }
+.graph-zoom button:hover { background: var(--surface); }
+.graph-detail { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 18px 16px 0; border-inline-start: 1px solid var(--line); background: var(--paper); }
+.graph-detail > header { flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.graph-detail > header > div { min-width: 0; }
+.graph-detail > header small { color: var(--muted); font-size: 11px; }
+.graph-detail h2 { max-height: 4.2em; margin: 4px 0 0; overflow: auto; overflow-wrap: anywhere; font-size: 18px; line-height: 1.4; }
+.graph-detail > header button { flex-shrink: 0; width: 32px; height: 32px; border-radius: 4px; }
+.graph-detail > header button:hover { background: var(--surface); }
+.graph-open-document { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; font-weight: 650; }
+.graph-detail h3 { flex: 0 0 auto; display: flex; justify-content: space-between; margin: 20px 0 0; padding-bottom: 10px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 600; }
+.graph-neighbors { min-height: 0; flex: 1 1 0; margin: 0; padding: 0; list-style: none; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.graph-neighbors li { display: flex; align-items: center; border-bottom: 1px solid var(--line-soft); }
+.graph-neighbors button { min-width: 0; flex: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-height: 44px; padding: 10px 4px; border: 0; background: transparent; color: var(--ink); text-align: start; font-size: 13px; cursor: pointer; }
+.graph-neighbors button span { overflow-wrap: anywhere; }
+.graph-neighbors small { flex-shrink: 0; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+.graph-neighbors a { flex-shrink: 0; display: grid; place-items: center; width: 32px; min-height: 44px; }
+.graph-neighbors li:hover { background: var(--surface); }
+.graph-view button:focus-visible, .graph-view a:focus-visible, .graph-view select:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (max-width: 1100px) {
+  .graph-title { flex-basis: calc(100% - 300px); }
+  .graph-search { flex: 1; min-width: 180px; }
+  .graph-stage.has-selection { grid-template-columns: minmax(0, 1fr) 260px; }
+}
+@media (max-width: 680px) {
+  .graph-view { height: calc(100dvh - 106px); min-height: 460px; }
+  .graph-toolbar { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 38px; gap: 8px; padding: 10px 12px; }
+  .graph-title { min-width: 0; margin: 0; grid-column: 1 / -1; }
+  .graph-title h1 { font-size: 18px; }
+  .graph-scope { grid-column: 1 / -1; }
+  .graph-scope a { flex: 1; padding: 5px 8px; }
+  .graph-language-picker select { width: 100%; }
+  .graph-search { grid-column: 1 / -1; width: 100%; min-width: 0; }
+  .graph-reset { grid-column: 2; grid-row: 3; }
+  .graph-stage.has-selection { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(150px, 1fr) minmax(0, 42%); }
+  .graph-detail { padding: 10px 12px 0; border-inline-start: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 8px; }
+  .graph-detail h2 { max-height: 2.8em; margin: 0; font-size: 15px; }
+  .graph-detail > header { min-width: 0; }
+  .graph-detail > header small { display: none; }
+  .graph-open-document { align-self: start; margin: 0; gap: 8px; padding: 6px 9px; }
+  .graph-detail h3 { grid-column: 1 / -1; margin-top: 6px; padding-bottom: 5px; }
+  .graph-neighbors { grid-column: 1 / -1; }
+  .graph-exploration { top: 8px; inset-inline-start: 8px; max-width: calc(100% - 16px); padding: 6px 8px; font-size: 11px; }
+}

@@ -1,0 +1,26 @@
+.box-picker-backdrop { position: fixed; z-index: 200; inset: 0; display: grid; place-items: center; padding: 20px; background: rgb(0 0 0 / 50%); }
+.box-picker { width: min(1050px, 100%); height: min(740px, calc(100dvh - 40px)); min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); box-shadow: 0 16px 60px rgb(0 0 0 / 20%); }
+.box-picker > header, .box-picker > footer { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border-bottom: 1px solid var(--line); }
+.box-picker h2 { margin: 0; font-size: 18px; }
+.box-picker button, .box-picker input { border: 1px solid var(--line); border-radius: 4px; padding: 8px 12px; background: var(--paper); color: var(--ink); font: inherit; }
+.box-picker button { cursor: pointer; }
+.box-picker button:disabled { opacity: .5; cursor: default; }
+.box-picker > footer { border-bottom: 0; border-top: 1px solid var(--line); }
+.box-picker > footer small { max-width: 72%; line-height: 1.5; }
+.box-picker-body { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: minmax(230px, .7fr) minmax(0, 1.3fr); overflow: hidden; }
+.box-picker-library { min-height: 0; display: flex; flex-direction: column; border-inline-end: 1px solid var(--line); }
+.box-picker-library > label { padding: 12px; display: grid; gap: 8px; }
+.box-picker-library input { min-width: 0; width: 100%; }
+.box-resource-list { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+.box-resource-list > button { display: grid; width: 100%; gap: 6px; padding: 14px; text-align: start; overflow-wrap: anywhere; }
+.box-resource-list > button small { opacity: .7; }
+.box-resource-list > button.selected { border-color: var(--accent); background: var(--surface); }
+.box-picker-preview { min-height: 0; min-width: 0; overflow: auto; padding: 18px; }
+.box-picker .box-message { flex: 0 0 auto; margin: 0; padding: 12px; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .box-picker-backdrop { padding: 8px; }
+  .box-picker { height: calc(100dvh - 16px); }
+  .box-picker-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(110px, .7fr) minmax(0, 1fr); }
+  .box-picker-library { border-inline-end: 0; border-bottom: 1px solid var(--line); }
+  .box-picker > footer { padding: 12px; }
+}

@@ -1,0 +1,22 @@
+.zed/
+.vscode/
+.idea/
+data/
+backups/
+build/
+.env
+.env.*
+!.env.example
+techpedia-transfer-*.tar.gz
+.codex
+.junie/
+web/node_modules/
+docs/node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+internal/server/static/dist/
+.DS_Store
+
+# The language-edition catalog is a build-time IANA snapshot, not runtime data.
+!internal/edition/data/
+!internal/edition/data/language-subtag-registry.txt
